@@ -45,7 +45,7 @@
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "AzureStack-VNET",
+            "defaultValue": "vNetUE",
             "metadata": {
                 "name": "AzureStack-VNET"
             }
@@ -55,21 +55,21 @@
         },
         "addressPrefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/24",
+            "defaultValue": "172.21.0.0/22",
             "metadata": {
                 "name": "10.0.0.0/24"
             }
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "default",
+            "defaultValue": "Server",
             "metadata": {
                 "name": "default"
             }
         },
         "subnetPrefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/24",
+            "defaultValue": "172.21.0.0/24",
             "metadata": {
                 "name": "10.0.0.0/24"
             }
@@ -134,10 +134,7 @@
         "adminUsername": "__administrator",
         "osDiskSizeinGB": 256,
         "location": "[resourceGroup().location]",
-        "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-NIC')]",
-        "networkSecurityGroupName": "[concat(parameters('virtualMachineName'),'-NSG')]",
-        "publicIpAddressName": "[concat(parameters('virtualMachineName'),'-IP')]"
-            
+        "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-NIC')]"
         },
     "resources": [
         {
@@ -245,35 +242,11 @@
             ]
         },
         {
-            "name": "[parameters('virtualNetworkName')]",
-            "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2016-12-01",
-            "location": "[variables('location')]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[parameters('addressPrefix')]"
-                    ]
-                },
-                "subnets": [
-                    {
-                        "name": "[parameters('subnetName')]",
-                        "properties": {
-                            "addressPrefix": "[parameters('subnetPrefix')]"
-                        }
-                    }
-                ]
-            }
-        },
-        {
             "name": "[variables('networkInterfaceName')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2016-09-01",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-                "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -283,50 +256,7 @@
                             "subnet": {
                                 "id": "[variables('subnetRef')]"
                             },
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIPAddress": {
-                                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
-                            }
-                        }
-                    }
-                ],
-                "networkSecurityGroup": {
-                    "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-                }
-            }
-        },
-        {
-            "name": "[variables('publicIpAddressName')]",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2017-06-01",
-            "location": "[variables('location')]",
-            "properties": {
-                "publicIPAllocationMethod": "[parameters('publicIpAddressType')]",
-                "publicIPAddressVersion": "IPv4",
-                "dnsSettings":{
-                    "domainNameLabel": "[parameters('publicDnsName')]",
-                    "fqdn": "[concat(parameters('publicDnsName'), '.',variables('location'), '.cloudapp.azure.com')]"
-                }
-            }
-        },
-        {
-            "name": "[variables('networkSecurityGroupName')]",
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2016-09-01",
-            "location": "[variables('location')]",
-            "properties": {
-                "securityRules": [
-                    {
-                        "name": "default-allow-rdp",
-                        "properties": {
-                            "priority": 1000,
-                            "sourceAddressPrefix": "*",
-                            "protocol": "Tcp",
-                            "destinationPortRange": "3389",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*"
+                            "privateIPAllocationMethod": "Dynamic"
                         }
                     }
                 ]
@@ -337,10 +267,6 @@
         "adminUsername": {
             "type": "string",
             "value": "[concat(parameters('virtualMachineName'),'\\','Administrator')]"
-        },
-        "IPAddress": {
-            "type": "string",
-            "value": "[reference(variables('publicIpAddressName')).dnssettings.fqdn]"
         }
     }
 }

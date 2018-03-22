@@ -1,4 +1,4 @@
-﻿$resourceGroupName = "azs3"
+﻿$resourceGroupName = "AzSUE"
 if (-not (Get-AzureRmSubscription))
 {
     Login-AzureRmAccount
@@ -17,22 +17,22 @@ else
     $disks | ? name -like *_OSDisk_* | Remove-AzureRmDisk -Force
     $disks | ? name -like *-disk* | Remove-AzureRmDisk -Force
 }
-Get-AzureRmVirtualNetwork -ResourceGroupName $resourceGroupName | Remove-AzureRmVirtualNetwork -Force
+#Get-AzureRmVirtualNetwork -ResourceGroupName $resourceGroupName | Remove-AzureRmVirtualNetwork -Force
 
-Remove-AzureRmResourceGroup -ResourceGroupName $resourceGroupName -Force
+#Remove-AzureRmResourceGroup -ResourceGroupName $resourceGroupName -Force
 
 Test-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName `
-  -TemplateUri https://raw.githubusercontent.com/MakerHe/yagmurs_AzureVMExtension/master/azuredeploy.json `
-  -TemplateParameterUri https://raw.githubusercontent.com/MakerHe/yagmurs_AzureVMExtension/master/azuredeploy.parameters.jsonRemove-AzureRmResourceGroup -Force
+  -TemplateUri https://raw.githubusercontent.com/MakerHe/AzureStack-VM-PoC/master/azuredeploy.json `
+  -TemplateParameterUri https://raw.githubusercontent.com/MakerHe/AzureStack-VM-PoC/master/azuredeploy.parameters.jsonRemove-AzureRmResourceGroup -Force
 
-New-AzureRmResourceGroup -Name $resourceGroupName -Location 'west europe'
+#New-AzureRmResourceGroup -Name $resourceGroupName -Location 'west europe'
 New-AzureRmResourceGroupDeployment -Name "$resourceGroupName-PoC-Deployment" -ResourceGroupName $resourceGroupName `
-  -TemplateUri https://raw.githubusercontent.com/MakerHe/yagmurs_AzureVMExtension/master/azuredeploy.json `
-  -TemplateParameterUri https://raw.githubusercontent.com/MakerHe/yagmurs_AzureVMExtension/master/azuredeploy.parameters.json `
+  -TemplateUri https://raw.githubusercontent.com/MakerHe/AzureStack-VM-PoC/master/azuredeploy.json `
+  -TemplateParameterUri https://raw.githubusercontent.com/MakerHe/AzureStack-VM-PoC/master/azuredeploy.parameters.json `
   -Mode Incremental
 
 New-AzureRmResourceGroupDeployment -Name "$resourceGroupName-PoC-Deployment" -ResourceGroupName $resourceGroupName `
-  -TemplateUri https://raw.githubusercontent.com/MakerHe/yagmurs_AzureVMExtension/master/azuredeploy.json `
+  -TemplateUri https://raw.githubusercontent.com/MakerHe/AzureStack-VM-PoC/master/azuredeploy.json `
   -Mode Incremental
 
 
